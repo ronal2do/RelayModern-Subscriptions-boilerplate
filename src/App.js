@@ -1,10 +1,24 @@
-import React, { Component } from 'react';
-import {graphql, QueryRenderer} from 'react-relay';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from 'react'
+import {graphql, QueryRenderer} from 'react-relay'
+
 import environment from './relay/Environment'
+import UserAddedSubscription from './relay/UserAddedSubscription'
+import logo from './logo.svg'
+ 
+import './App.css'
 
 class App extends Component {
+  componentWillMount() {
+    if (this.subscription) {
+      this.subscription.dispose()
+    }
+    this.subscription = UserAddedSubscription()
+  }
+  
+  renderUserList = users => users.map(user => 
+    <div key={user.node._id} >{user.node.name}</div>
+  )
+  
   render() {
     return (
       <div className="App">
@@ -15,35 +29,45 @@ class App extends Component {
         <p className="App-intro">
           To get started, edit <code>src/App.js</code> and save to reload.
         </p>
-         <QueryRenderer
-            environment={environment}
-            query={graphql`
-              query AppQuery {
-                users {
-                  count
-                  edges {
-                    node {
-                      _id
-                      name
-                    }
-                  }
-                }
-              }
-            `}
-            variables={{}}
-            render={({error, props}) => {
-              if (error) {
-                return <div>Error!</div>;
-              }
-              if (!props) {
-                return <div>Loading...</div>;
-              }
-              return <div>User ID: {props.users.edges[0].node._id}</div>;
-            }}
-          />
-      </div>
+        {this.renderUserList(this.props.users)}
+       </div>
     );
   }
 }
 
-export default App;
+const AppQueryRenderer = () => 
+  <QueryRenderer
+    environment={environment}
+    query={graphql`
+      query AppQuery {
+        users(
+          first: 6
+        ) @connection(key: "App_users") {
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+          count
+          edges {
+            node {
+              _id
+              id
+              name
+            }
+          }
+        }
+      }
+    `}
+    variables={{}}
+    render={({error, props}) => {
+      if (error) {
+        return <div>Error!</div>;
+      }
+      if (!props) {
+        return <div>Loading...</div>;
+      }
+      return <App users={props.users.edges} />
+    }}
+  />
+
+export default AppQueryRenderer

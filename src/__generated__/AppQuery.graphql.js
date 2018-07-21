@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 00549b9c496f9b031e6e0d2f65a39bdf
+ * @relayHash 9657f9266c06b5eaa2f1788a4d2d79ea
  */
 
 /* eslint-disable */
@@ -12,10 +12,15 @@ import type { ConcreteRequest } from 'relay-runtime';
 export type AppQueryVariables = {||};
 export type AppQueryResponse = {|
   +users: ?{|
+    +pageInfo: {|
+      +hasNextPage: boolean,
+      +endCursor: ?string,
+    |},
     +count: ?number,
     +edges: ?$ReadOnlyArray<?{|
       +node: ?{|
         +_id: ?string,
+        +id: string,
         +name: ?string,
       |}
     |}>,
@@ -26,48 +31,135 @@ export type AppQueryResponse = {|
 
 /*
 query AppQuery {
-  users {
+  users(first: 6) {
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
     count
     edges {
       node {
         _id
-        name
         id
+        name
+        __typename
       }
+      cursor
     }
   }
 }
 */
 
 const node/*: ConcreteRequest*/ = (function(){
-var v0 = {
-  "kind": "ScalarField",
-  "alias": null,
-  "name": "count",
-  "args": null,
-  "storageKey": null
-},
-v1 = {
-  "kind": "ScalarField",
-  "alias": null,
-  "name": "_id",
-  "args": null,
-  "storageKey": null
-},
-v2 = {
-  "kind": "ScalarField",
-  "alias": null,
-  "name": "name",
-  "args": null,
-  "storageKey": null
-};
+var v0 = [
+  {
+    "kind": "LinkedField",
+    "alias": null,
+    "name": "pageInfo",
+    "storageKey": null,
+    "args": null,
+    "concreteType": "PageInfo",
+    "plural": false,
+    "selections": [
+      {
+        "kind": "ScalarField",
+        "alias": null,
+        "name": "hasNextPage",
+        "args": null,
+        "storageKey": null
+      },
+      {
+        "kind": "ScalarField",
+        "alias": null,
+        "name": "endCursor",
+        "args": null,
+        "storageKey": null
+      }
+    ]
+  },
+  {
+    "kind": "ScalarField",
+    "alias": null,
+    "name": "count",
+    "args": null,
+    "storageKey": null
+  },
+  {
+    "kind": "LinkedField",
+    "alias": null,
+    "name": "edges",
+    "storageKey": null,
+    "args": null,
+    "concreteType": "UserEdge",
+    "plural": true,
+    "selections": [
+      {
+        "kind": "LinkedField",
+        "alias": null,
+        "name": "node",
+        "storageKey": null,
+        "args": null,
+        "concreteType": "User",
+        "plural": false,
+        "selections": [
+          {
+            "kind": "ScalarField",
+            "alias": null,
+            "name": "_id",
+            "args": null,
+            "storageKey": null
+          },
+          {
+            "kind": "ScalarField",
+            "alias": null,
+            "name": "id",
+            "args": null,
+            "storageKey": null
+          },
+          {
+            "kind": "ScalarField",
+            "alias": null,
+            "name": "name",
+            "args": null,
+            "storageKey": null
+          },
+          {
+            "kind": "ScalarField",
+            "alias": null,
+            "name": "__typename",
+            "args": null,
+            "storageKey": null
+          }
+        ]
+      },
+      {
+        "kind": "ScalarField",
+        "alias": null,
+        "name": "cursor",
+        "args": null,
+        "storageKey": null
+      }
+    ]
+  }
+];
 return {
   "kind": "Request",
   "operationKind": "query",
   "name": "AppQuery",
   "id": null,
-  "text": "query AppQuery {\n  users {\n    count\n    edges {\n      node {\n        _id\n        name\n        id\n      }\n    }\n  }\n}\n",
-  "metadata": {},
+  "text": "query AppQuery {\n  users(first: 6) {\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n    count\n    edges {\n      node {\n        _id\n        id\n        name\n        __typename\n      }\n      cursor\n    }\n  }\n}\n",
+  "metadata": {
+    "connection": [
+      {
+        "count": null,
+        "cursor": null,
+        "direction": "forward",
+        "path": [
+          "users"
+        ]
+      }
+    ]
+  },
   "fragment": {
     "kind": "Fragment",
     "name": "AppQuery",
@@ -77,39 +169,13 @@ return {
     "selections": [
       {
         "kind": "LinkedField",
-        "alias": null,
-        "name": "users",
+        "alias": "users",
+        "name": "__App_users_connection",
         "storageKey": null,
         "args": null,
         "concreteType": "UserConnection",
         "plural": false,
-        "selections": [
-          v0,
-          {
-            "kind": "LinkedField",
-            "alias": null,
-            "name": "edges",
-            "storageKey": null,
-            "args": null,
-            "concreteType": "UserEdge",
-            "plural": true,
-            "selections": [
-              {
-                "kind": "LinkedField",
-                "alias": null,
-                "name": "node",
-                "storageKey": null,
-                "args": null,
-                "concreteType": "User",
-                "plural": false,
-                "selections": [
-                  v1,
-                  v2
-                ]
-              }
-            ]
-          }
-        ]
+        "selections": v0
       }
     ]
   },
@@ -122,49 +188,39 @@ return {
         "kind": "LinkedField",
         "alias": null,
         "name": "users",
-        "storageKey": null,
-        "args": null,
+        "storageKey": "users(first:6)",
+        "args": [
+          {
+            "kind": "Literal",
+            "name": "first",
+            "value": 6,
+            "type": "Int"
+          }
+        ],
         "concreteType": "UserConnection",
         "plural": false,
-        "selections": [
-          v0,
+        "selections": v0
+      },
+      {
+        "kind": "LinkedHandle",
+        "alias": null,
+        "name": "users",
+        "args": [
           {
-            "kind": "LinkedField",
-            "alias": null,
-            "name": "edges",
-            "storageKey": null,
-            "args": null,
-            "concreteType": "UserEdge",
-            "plural": true,
-            "selections": [
-              {
-                "kind": "LinkedField",
-                "alias": null,
-                "name": "node",
-                "storageKey": null,
-                "args": null,
-                "concreteType": "User",
-                "plural": false,
-                "selections": [
-                  v1,
-                  v2,
-                  {
-                    "kind": "ScalarField",
-                    "alias": null,
-                    "name": "id",
-                    "args": null,
-                    "storageKey": null
-                  }
-                ]
-              }
-            ]
+            "kind": "Literal",
+            "name": "first",
+            "value": 6,
+            "type": "Int"
           }
-        ]
+        ],
+        "handle": "connection",
+        "key": "App_users",
+        "filters": null
       }
     ]
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '273fb58871322260e47d9b1bfaa593ba';
+(node/*: any*/).hash = 'a0ed8cd3a7570649588f225b6a57e1a7';
 module.exports = node;
